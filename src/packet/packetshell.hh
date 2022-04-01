@@ -13,6 +13,7 @@
 #include "event_loop.hh"
 #include "socketpair.hh"
 
+// FerryQueueType 就是一个类型参数名，随意取的，不要在意
 template <class FerryQueueType>
 class PacketShell
 {
@@ -43,8 +44,8 @@ public:
     PacketShell( const std::string & device_prefix, char ** const user_environment );
 
     template <typename... Targs>
-    void start_uplink( const std::string & shell_prefix,
-                       const std::vector< std::string > & command,
+    void start_uplink( const std::string & shell_prefix, // shell的前缀， 即 [delay 50 ms] 
+                       const std::vector< std::string > & command, // 命令的vector容器集合
                        Targs&&... Fargs );
 
     template <typename... Targs>

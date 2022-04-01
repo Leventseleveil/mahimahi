@@ -8,6 +8,7 @@
 
 using namespace std;
 
+// myatoi 将字符串转换为int，const int base = 10
 long int myatoi( const string & str, const int base )
 {
     if ( str.empty() ) {
@@ -28,6 +29,7 @@ long int myatoi( const string & str, const int base )
     return ret;
 }
 
+// myatof 将字符串转换为双精度浮点型
 double myatof( const string & str )
 {
     if ( str.empty() ) {
