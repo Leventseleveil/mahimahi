@@ -14,12 +14,15 @@ int main( int argc, char *argv[] )
 {
     try {
         /* clear environment while running as root */
+        // 以root用户身份运行时清除环境
         char ** const user_environment = environ;
         environ = nullptr;
 
         check_requirements( argc, argv );
 
-        if ( argc < 2 ) {
+        // argc 为程序运行时发送给main函数的命令行参数的个数
+        // argv[ 0 ] 为 mm-delay（argv[0]指向程序运行的全路径名 ）
+        if ( argc < 2 ) { 
             throw runtime_error( "Usage: " + string( argv[ 0 ] ) + " delay-milliseconds [command...]" );
         }
 
@@ -35,6 +38,7 @@ int main( int argc, char *argv[] )
             }
         }
 
+        // 重新建立一个shell，形如：[delay 50 ms] parallels@ubuntu-linux-20-04-desktop:~$ 
         PacketShell<DelayQueue> delay_shell_app( "delay", user_environment );
 
         delay_shell_app.start_uplink( "[delay " + to_string( delay_ms ) + " ms] ",

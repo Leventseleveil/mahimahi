@@ -16,7 +16,7 @@
 class LinkQueue
 {
 private:
-    const static unsigned int PACKET_SIZE = 1504; /* default max TUN payload size */
+    const static unsigned int PACKET_SIZE = 1504; /* default max TUN payload size */ // 有效载荷大小
 
     unsigned int next_delivery_;
     std::vector<uint64_t> schedule_;

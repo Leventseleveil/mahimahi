@@ -21,7 +21,7 @@
 using namespace std;
 using namespace PollerShortNames;
 
-template <class FerryQueueType>
+template <class FerryQueueType> // 构造函数，初始化列表
 PacketShell<FerryQueueType>::PacketShell( const std::string & device_prefix, char ** const user_environment )
     : user_environment_( user_environment ),
       egress_ingress( two_unassigned_addresses( get_mahimahi_base() ) ),
@@ -47,7 +47,7 @@ void PacketShell<FerryQueueType>::start_uplink( const string & shell_prefix,
                                                 const vector< string > & command,
                                                 Targs&&... Fargs )
 {
-    /* g++ bug 55914 makes this hard before version 4.9 */
+    /* g++ bug 55914 makes this hard before version 4.9 */ // forward 可以将参数完美转发
     BindWorkAround::bind<FerryQueueType, Targs&&...> ferry_maker( forward<Targs>( Fargs )... );
 
     /*
@@ -63,11 +63,11 @@ void PacketShell<FerryQueueType>::start_uplink( const string & shell_prefix,
     event_loop_.add_special_child_process( 77, "packetshell", [&]() {
             TunDevice ingress_tun( "ingress", ingress_addr(), egress_addr() );
 
-            /* bring up localhost */
+            /* bring up localhost */ // 调出本地主机
             interface_ioctl( SIOCSIFFLAGS, "lo",
                              [] ( ifreq &ifr ) { ifr.ifr_flags = IFF_UP; } );
 
-            /* create default route */
+            /* create default route */ // 创建默认路由
             rtentry route;
             zero( route );
 
@@ -81,6 +81,10 @@ void PacketShell<FerryQueueType>::start_uplink( const string & shell_prefix,
 
             /* dnsmasq doesn't distinguish between UDP and TCP forwarding nameservers,
                so use a DNSProxy that listens on the same UDP and TCP port */
+            /**
+             * dnsmasq不区分UDP和TCP转发名称服务器。因此，请使用在同一UDP和TCP端口上侦听的DNSProxy
+             * 
+             */
 
             UDPSocket dns_udp_listener;
             dns_udp_listener.bind( ingress_addr() );

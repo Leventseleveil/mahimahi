@@ -7,12 +7,12 @@
 #include "drop_head_packet_queue.hh"
 #include "codel_packet_queue.hh"
 #include "pie_packet_queue.hh"
-#include "link_queue.hh"
+#include "link_queue.hh" // 引入link_queue.cc依赖
 #include "packetshell.cc"
 
 using namespace std;
 
-void usage_error( const string & program_name )
+void usage_error( const string & program_name ) // 这里 program_name是mm-link
 {
     cerr << "Usage: " << program_name << " UPLINK-TRACE DOWNLINK-TRACE [OPTION]... [COMMAND]" << endl;
     cerr << endl;
@@ -87,7 +87,7 @@ int main( int argc, char *argv[] )
         }
 
         const option command_line_options[] = {
-            { "uplink-log",           required_argument, nullptr, 'u' },
+            { "uplink-log",           required_argument, nullptr, 'u' }, // 最后一个值为返回值
             { "downlink-log",         required_argument, nullptr, 'd' },
             { "once",                       no_argument, nullptr, 'o' },
             { "meter-uplink",               no_argument, nullptr, 'm' },
@@ -117,7 +117,7 @@ int main( int argc, char *argv[] )
 
             switch ( opt ) {
             case 'u':
-                uplink_logfile = optarg;
+                uplink_logfile = optarg; // oprarg 表示当前选项对应的参数值
                 break;
             case 'd':
                 downlink_logfile = optarg;
@@ -162,12 +162,13 @@ int main( int argc, char *argv[] )
             }
         }
 
-        if ( optind + 1 >= argc ) {
+        // 保证当前下标没过总参数值
+        if ( optind + 1 >= argc ) { // optind 表示的是下一个将被处理到的参数在argv中的下标值
             usage_error( argv[ 0 ] );
         }
 
-        const string uplink_filename = argv[ optind ];
-        const string downlink_filename = argv[ optind + 1 ];
+        const string uplink_filename = argv[ optind ];  // /home/parallels/mahimahi/traces/Verizon-LTE-short.up 
+        const string downlink_filename = argv[ optind + 1 ];    // /home/parallels/mahimahi/traces/Verizon-LTE-short.down
 
         vector<string> command;
 
