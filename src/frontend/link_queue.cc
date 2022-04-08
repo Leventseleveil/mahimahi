@@ -77,7 +77,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
         throw runtime_error( filename + ": trace must last for a nonzero amount of time" ); // trace必须持续一段时间
     }
 
-    /* open logfile if called for */
+    /* open logfile if called for */ // 如果需要的话，打开日志文件
     if ( not logfile.empty() ) {
         log_.reset( new ofstream( logfile ) );
         if ( not log_->good() ) {
