@@ -90,11 +90,11 @@ int main( int argc, char *argv[] )
             { "uplink-log",           required_argument, nullptr, 'u' }, // 最后一个值为返回值
             { "downlink-log",         required_argument, nullptr, 'd' },
             { "once",                       no_argument, nullptr, 'o' },
-            { "meter-uplink",               no_argument, nullptr, 'm' },
-            { "meter-downlink",             no_argument, nullptr, 'n' },
-            { "meter-uplink-delay",         no_argument, nullptr, 'x' },
-            { "meter-downlink-delay",       no_argument, nullptr, 'y' },
-            { "meter-all",                  no_argument, nullptr, 'z' },
+            { "meter-uplink",               no_argument, nullptr, 'm' }, // 看上传吞吐量图
+            { "meter-downlink",             no_argument, nullptr, 'n' }, // 看下载吞吐量图
+            { "meter-uplink-delay",         no_argument, nullptr, 'x' }, // 看上传延迟图
+            { "meter-downlink-delay",       no_argument, nullptr, 'y' }, // 看下载延迟图
+            { "meter-all",                  no_argument, nullptr, 'z' }, // 四个图都看
             { "uplink-queue",         required_argument, nullptr, 'q' },
             { "downlink-queue",       required_argument, nullptr, 'w' },
             { "uplink-queue-args",    required_argument, nullptr, 'a' },
@@ -162,7 +162,7 @@ int main( int argc, char *argv[] )
             }
         }
 
-        // 保证当前下标没过总参数值
+        // 保证当前下标没超过总参数值
         if ( optind + 1 >= argc ) { // optind 表示的是下一个将被处理到的参数在argv中的下标值
             usage_error( argv[ 0 ] );
         }
@@ -182,7 +182,7 @@ int main( int argc, char *argv[] )
 
         PacketShell<LinkQueue> link_shell_app( "link", user_environment );
 
-        link_shell_app.start_uplink( "[link] ", command,
+        link_shell_app.start_uplink( "[link] ", command, // [link] xun1@ubuntu:~/mahimahi$ 
                                      "Uplink", uplink_filename, uplink_logfile, repeat, meter_uplink, meter_uplink_delay,
                                      get_packet_queue( uplink_queue_type, uplink_queue_args, argv[ 0 ] ),
                                      command_line );

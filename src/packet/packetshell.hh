@@ -45,7 +45,7 @@ public:
 
     template <typename... Targs>
     void start_uplink( const std::string & shell_prefix, // shell的前缀， 即 [delay 50 ms] 
-                       const std::vector< std::string > & command, // 命令的vector容器集合
+                       const std::vector< std::string > & command, // 命令的vector容器集合 或是 xun1@ubuntu:~/mahimahi$  不清楚
                        Targs&&... Fargs );
 
     template <typename... Targs>

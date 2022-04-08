@@ -95,7 +95,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
         }
     }
 
-    /* create graphs if called for */
+    /* create graphs if called for */  // 如果需要的话创建图表
     if ( graph_throughput ) {
         throughput_graph_.reset( new BinnedLiveGraph( link_name + " [" + filename + "]",
                                                       { make_tuple( 1.0, 0.0, 0.0, 0.25, true ),
