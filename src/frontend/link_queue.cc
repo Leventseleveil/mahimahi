@@ -11,12 +11,13 @@
 
 using namespace std;
 
+// 构造函数及初始化过程
 LinkQueue::LinkQueue( const string & link_name, const string & filename, const string & logfile,
                       const bool repeat, const bool graph_throughput, const bool graph_delay,
                       unique_ptr<AbstractPacketQueue> && packet_queue,
                       const string & command_line )
     : next_delivery_( 0 ),
-      schedule_(),
+      schedule_(), // schedule 表示时刻表容器/时间戳容器
       base_timestamp_( timestamp() ),
       packet_queue_( move( packet_queue ) ),
       packet_in_transit_( "", 0 ),
@@ -26,41 +27,54 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
       throughput_graph_( nullptr ),
       delay_graph_( nullptr ),
       repeat_( repeat ),
-      finished_( false )
+      finished_( false ) // finished表示读取完成的信号
 {
     assert_not_root();
 
     /* open filename and load schedule */
-    ifstream trace_file( filename );
+    ifstream trace_file( filename ); // ifstream是从硬盘到内存，其实所谓的流缓冲就是内存空间
 
+    // 检查
     if ( not trace_file.good() ) {
         throw runtime_error( filename + ": error opening for reading" );
     }
 
     string line;
 
+
     while ( trace_file.good() and getline( trace_file, line ) ) {
+
+        // 首先检查该行是否为空
         if ( line.empty() ) {
             throw runtime_error( filename + ": invalid empty line" );
         }
 
-        const uint64_t ms = myatoi( line );
+        /**
+         * 在traces文件中的每一行代表着一个包发送机会：在这个时间点MTU大小的包将被发送。
+         * ms 表示时间戳
+         * myatoi 将字符串转换为int
+         */
+        const uint64_t ms = myatoi( line ); 
 
-        if ( not schedule_.empty() ) {
-            if ( ms < schedule_.back() ) {
-                throw runtime_error( filename + ": timestamps must be monotonically nondecreasing" );
+        // 检查每行是否单调递增，因为时间戳必须是单调不变的
+        if ( not schedule_.empty() ) { // 不用检查第一个，因为就一个数无法检查是否单调递增（用empty的原因）
+            if ( ms < schedule_.back() ) { // back 用于访问矢量的最后一个元素，它返回对矢量的最后一个元素的引用。
+                throw runtime_error( filename + ": timestamps must be monotonically nondecreasing" ); // 时间戳必须是单调不变的
             }
         }
 
-        schedule_.emplace_back( ms );
+        /**
+         * emplace_back() 在实现时，直接在容器尾部创建这个元素，省去了拷贝或移动元素的过程。（对比push_back）
+         */
+        schedule_.emplace_back( ms ); // schedule_是个64位机器上的vector
     }
 
     if ( schedule_.empty() ) {
         throw runtime_error( filename + ": no valid timestamps found" );
     }
 
-    if ( schedule_.back() == 0 ) {
-        throw runtime_error( filename + ": trace must last for a nonzero amount of time" );
+    if ( schedule_.back() == 0 ) { // 如果vector的元素类型是int，默认初始化为0；
+        throw runtime_error( filename + ": trace must last for a nonzero amount of time" ); // trace必须持续一段时间
     }
 
     /* open logfile if called for */
@@ -124,6 +138,7 @@ void LinkQueue::record_drop( const uint64_t time, const size_t pkts_dropped, con
     }
 }
 
+// 记录离开的时机
 void LinkQueue::record_departure_opportunity( void )
 {
     /* log the delivery opportunity */
@@ -207,9 +222,10 @@ void LinkQueue::use_a_delivery_opportunity( void )
     }
 }
 
-/* emulate the link up to the given timestamp */
+/* emulate the link up to the given timestamp */ // 模拟链接直到给定的时间戳
 /* this function should be called before enqueueing any packets and before
    calculating the wait_time until the next event */
+// 在将任何数据包排入队列之前，以及在计算下一个事件之前的等待时间之前，应该调用此函数
 void LinkQueue::rationalize( const uint64_t now )
 {
     while ( next_delivery_time() <= now ) {
