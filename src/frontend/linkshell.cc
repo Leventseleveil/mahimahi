@@ -24,10 +24,11 @@ void usage_error( const string & program_name ) // 这里 program_name是mm-link
     cerr << "          --uplink-queue=QUEUE_TYPE --downlink-queue=QUEUE_TYPE" << endl;
     cerr << "          --uplink-queue-args=QUEUE_ARGS --downlink-queue-args=QUEUE_ARGS" << endl;
     cerr << endl;
-    cerr << "          QUEUE_TYPE = infinite | droptail | drophead | codel | pie" << endl;
+    cerr << "          QUEUE_TYPE = infinite | droptail | drophead | codel | pie" << endl; // 极大的 ｜ 丢弃尾部 ｜ 丢弃首部 ｜ 
     cerr << "          QUEUE_ARGS = \"NAME=NUMBER[, NAME2=NUMBER2, ...]\"" << endl;
     cerr << "              (with NAME = bytes | packets | target | interval | qdelay_ref | max_burst)" << endl;
     cerr << "                  target, interval, qdelay_ref, max_burst are in milli-second" << endl << endl;
+    // 目标、间隔、队列延迟、最大爆发以毫秒为单位
 
     throw runtime_error( "invalid arguments" );
 }
@@ -87,9 +88,9 @@ int main( int argc, char *argv[] )
         }
 
         const option command_line_options[] = {
-            { "uplink-log",           required_argument, nullptr, 'u' }, // 最后一个值为返回值
-            { "downlink-log",         required_argument, nullptr, 'd' },
-            { "once",                       no_argument, nullptr, 'o' },
+            { "uplink-log",           required_argument, nullptr, 'u' }, // 上传链路日志，最后一个值（'u'）为返回值
+            { "downlink-log",         required_argument, nullptr, 'd' }, // 下载
+            { "once",                       no_argument, nullptr, 'o' }, // 是否重复循环播放，默认重复循环
             { "meter-uplink",               no_argument, nullptr, 'm' }, // 看上传吞吐量图
             { "meter-downlink",             no_argument, nullptr, 'n' }, // 看下载吞吐量图
             { "meter-uplink-delay",         no_argument, nullptr, 'x' }, // 看上传延迟图

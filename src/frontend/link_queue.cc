@@ -26,10 +26,10 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
       log_(),
       throughput_graph_( nullptr ),
       delay_graph_( nullptr ),
-      repeat_( repeat ),
+      repeat_( repeat ), // 初始值为true，表示默认重复读取文件
       finished_( false ) // finished表示读取完成的信号
 {
-    assert_not_root();
+    assert_not_root(); // 断言不是root用户
 
     /* open filename and load schedule */
     ifstream trace_file( filename ); // ifstream是从硬盘到内存，其实所谓的流缓冲就是内存空间
@@ -51,7 +51,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
 
         /**
          * 在traces文件中的每一行代表着一个包发送机会：在这个时间点MTU大小的包将被发送。
-         * ms 表示时间戳
+         * ms 表示时间戳, 每一ms发送一个包
          * myatoi 将字符串转换为int
          */
         const uint64_t ms = myatoi( line ); 
@@ -96,7 +96,9 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
     }
 
     /* create graphs if called for */  // 如果需要的话创建图表
+    // 对应linkshell.cc 中的meter-uplink/downlink 等参数是否打开
     if ( graph_throughput ) {
+        // 重制图表
         throughput_graph_.reset( new BinnedLiveGraph( link_name + " [" + filename + "]",
                                                       { make_tuple( 1.0, 0.0, 0.0, 0.25, true ),
                                                         make_tuple( 0.0, 0.0, 0.4, 1.0, false ),
@@ -108,6 +110,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                                                       [] ( int, int & x ) { x = 0; } ) );
     }
 
+    // 对应linkshell.cc 中的meter-uplink/downlink-delay是否打开
     if ( graph_delay ) {
         delay_graph_.reset( new BinnedLiveGraph( link_name + " delay [" + filename + "]",
                                                  { make_tuple( 0.0, 0.25, 0.0, 1.0, false ) },
@@ -117,11 +120,12 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
     }
 }
 
+// 记录到达
 void LinkQueue::record_arrival( const uint64_t arrival_time, const size_t pkt_size )
 {
     /* log it */
     if ( log_ ) {
-        *log_ << arrival_time << " + " << pkt_size << endl;
+        *log_ << arrival_time << " + " << pkt_size << endl; // *log_ *表示挥动魔法棒
     }
 
     /* meter it */
@@ -130,6 +134,7 @@ void LinkQueue::record_arrival( const uint64_t arrival_time, const size_t pkt_si
     }
 }
 
+// 记录丢弃
 void LinkQueue::record_drop( const uint64_t time, const size_t pkts_dropped, const size_t bytes_dropped)
 {
     /* log it */
@@ -152,6 +157,7 @@ void LinkQueue::record_departure_opportunity( void )
     }    
 }
 
+// 记录离开
 void LinkQueue::record_departure( const uint64_t departure_time, const QueuedPacket & packet )
 {
     /* log the delivery */
@@ -170,11 +176,12 @@ void LinkQueue::record_departure( const uint64_t departure_time, const QueuedPac
     }    
 }
 
+// 读包
 void LinkQueue::read_packet( const string & contents )
 {
     const uint64_t now = timestamp();
 
-    if ( contents.size() > PACKET_SIZE ) {
+    if ( contents.size() > PACKET_SIZE ) { // 如果传送的包容量超过限定 const static unsigned int PACKET_SIZE = 1504;
         throw runtime_error( "packet size is greater than maximum" );
     }
 
@@ -197,6 +204,7 @@ void LinkQueue::read_packet( const string & contents )
     }
 }
 
+// 下一次传递时间
 uint64_t LinkQueue::next_delivery_time( void ) const
 {
     if ( finished_ ) {
