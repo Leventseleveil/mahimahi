@@ -42,10 +42,12 @@ inline void print_exception( const std::exception & e, std::ostream & output = s
     output << "Died on " << abi::__cxa_demangle( typeid( e ).name(), nullptr, nullptr, nullptr ) << ": " << e.what() << std::endl;
 }
 
-/* error-checking wrapper for most syscalls */
+/* error-checking wrapper for most syscalls 针对大多数系统调用时的 《封装出错核查》*/
+// inline 表示是内联函数，就是在类内部展开，调用时没有入栈和出栈的过程，比较便捷
+// SystemCall检查return_value是否大于零
 inline int SystemCall( const std::string & s_attempt, const int return_value )
 {
-  if ( return_value >= 0 ) {
+  if ( return_value >= 0 ) { // 看似检查是否返回值大于0，其实只是检查函数调用是否正确
     return return_value;
   }
 

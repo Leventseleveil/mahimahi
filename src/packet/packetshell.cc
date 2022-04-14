@@ -174,6 +174,7 @@ int PacketShell<FerryQueueType>::Ferry::loop( FerryQueueType & ferry_queue,
                                               FileDescriptor & sibling )
 {
     /* tun device gets datagram -> read it -> give to ferry */
+    // tun设备获取数据报->读取->发送给ferry
     add_simple_input_handler( tun, 
                               [&] () {
                                   ferry_queue.read_packet( tun.read() );

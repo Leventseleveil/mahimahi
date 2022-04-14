@@ -275,11 +275,11 @@ void LinkQueue::rationalize( const uint64_t now )
             assert( packet_in_transit_bytes_left_ > 0 );
             assert( packet_in_transit_bytes_left_ <= packet_in_transit_.contents.size() );
 
-            /* how many bytes of the delivery opportunity can we use? */
+            /* how many bytes of the delivery opportunity can we use? 我们可以使用多少字节的传递机会 */
             const unsigned int amount_to_send = min( bytes_left_in_this_delivery,
                                                      packet_in_transit_bytes_left_ );
 
-            /* send that many bytes */
+            /* send that many bytes 发送多少字节*/
             packet_in_transit_bytes_left_ -= amount_to_send;
             bytes_left_in_this_delivery -= amount_to_send;
 

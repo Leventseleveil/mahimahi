@@ -54,7 +54,7 @@ int main( int argc, char *argv[] )
 
         if ( argc == 3 ) {
             command.push_back( shell_path() );
-        } else {
+        } else { // 如果参数个数多于3个，则把后面的command也依次输入继续执行（也就是并行，像mm-delay 50 mm-link ...）
             for ( int i = 3; i < argc; i++ ) {
                 command.push_back( argv[ i ] );
             }
@@ -62,6 +62,7 @@ int main( int argc, char *argv[] )
 
         PacketShell<IIDLoss> loss_app( "loss", user_environment );
 
+        // 加前缀 [loss up=0.5] xun1@ubuntu:~/mahimahi$
         string shell_prefix = "[loss ";
         if ( link == "uplink" ) {
             shell_prefix += "up=";

@@ -27,6 +27,7 @@ public:
 
     bool pending_output( void ) const { return wait_time() <= 0; }
 
+    // finished（）一直返回false，表示直到你退出当前shell
     static bool finished( void ) { return false; }
 };
 

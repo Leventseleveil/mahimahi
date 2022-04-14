@@ -78,10 +78,11 @@ int main( int argc, char *argv[] )
 
         check_requirements( argc, argv );
 
-        if ( argc < 3 ) {
+        if ( argc < 3 ) { // d 在这里卡 UPLINK-TRACE DOWNLINK-TRACE 俩参数
             usage_error( argv[ 0 ] );
         }
 
+        // 这里对参数做出各种处理，通过command_line
         string command_line { shell_quote( argv[ 0 ] ) }; /* for the log file */
         for ( int i = 1; i < argc; i++ ) {
             command_line += string( " " ) + shell_quote( argv[ i ] );
@@ -168,15 +169,15 @@ int main( int argc, char *argv[] )
             usage_error( argv[ 0 ] );
         }
 
-        const string uplink_filename = argv[ optind ];  // /home/parallels/mahimahi/traces/Verizon-LTE-short.up 
-        const string downlink_filename = argv[ optind + 1 ];    // /home/parallels/mahimahi/traces/Verizon-LTE-short.down
+        const string uplink_filename = argv[ optind ];  // d /home/parallels/mahimahi/traces/Verizon-LTE-short.up 
+        const string downlink_filename = argv[ optind + 1 ];    // d /home/parallels/mahimahi/traces/Verizon-LTE-short.down
 
         vector<string> command;
 
-        if ( optind + 2 == argc ) {
+        if ( optind + 2 == argc ) { // if ( optind  == argc )
             command.push_back( shell_path() );
         } else {
-            for ( int i = optind + 2; i < argc; i++ ) {
+            for ( int i = optind + 2; i < argc; i++ ) { // d 2
                 command.push_back( argv[ i ] );
             }
         }

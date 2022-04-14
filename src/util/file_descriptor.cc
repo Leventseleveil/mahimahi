@@ -70,7 +70,7 @@ string::const_iterator FileDescriptor::write( const string::const_iterator & beg
 /* read method */
 string FileDescriptor::read( const size_t limit )
 {
-    char buffer[ BUFFER_SIZE ];
+    char buffer[ BUFFER_SIZE ]; // BUFFER_SIZE = 1MB
 
     ssize_t bytes_read = SystemCall( "read", ::read( fd_, buffer, min( BUFFER_SIZE, limit ) ) );
     if ( bytes_read == 0 ) {
@@ -79,7 +79,7 @@ string FileDescriptor::read( const size_t limit )
 
     register_read();
 
-    return string( buffer, bytes_read );
+    return string( buffer, bytes_read ); // 从bytes_read位置开始截取buffer字符串
 }
 
 /* write method */

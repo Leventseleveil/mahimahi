@@ -15,7 +15,7 @@ private:
     unsigned int read_count_, write_count_;
 
     /* maximum size of a read */
-    const static size_t BUFFER_SIZE = 1024 * 1024;
+    const static size_t BUFFER_SIZE = 1024 * 1024; // 表示所能达到的最大长度，它是无符号整数。1024bytes*1024 = 1024KB = 1MB
 
 protected:
     void register_read( void ) { read_count_++; }

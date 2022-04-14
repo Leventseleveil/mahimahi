@@ -35,6 +35,7 @@ public:
     static bool finished( void ) { return false; }
 };
 
+//     派生类   继承方式  基类 
 class IIDLoss : public LossQueue
 {
 private:
@@ -50,7 +51,7 @@ class SwitchingLink : public LossQueue
 {
 private:
     bool link_is_on_;
-    std::exponential_distribution<> on_process_;
+    std::exponential_distribution<> on_process_; // 指数分布(Exponential distribution)模板
     std::exponential_distribution<> off_process_;
 
     uint64_t next_switch_time_;

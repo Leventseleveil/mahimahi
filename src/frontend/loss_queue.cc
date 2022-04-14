@@ -31,7 +31,7 @@ unsigned int LossQueue::wait_time( void )
     return packet_queue_.empty() ? numeric_limits<uint16_t>::max() : 0;
 }
 
-bool IIDLoss::drop_packet( const string & packet __attribute((unused)) )
+bool IIDLoss::drop_packet( const string & packet __attribute((unused)) )  // __attribute((unused)) 表示该函数或变量可能不使用（因为可能虽然指定了参数 但是参数为0），这个属性可以避免编译器产生警告信息
 {
     return drop_dist_( prng_ );
 }

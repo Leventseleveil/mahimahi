@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void DelayQueue::read_packet( const string & contents ) // 从trace读包
+void DelayQueue::read_packet( const string & contents ) 
 {
     packet_queue_.emplace( timestamp() + delay_ms_, contents ); // 当前时间戳+延长的时间，包
 }
