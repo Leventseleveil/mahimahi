@@ -7,12 +7,12 @@
 
 using namespace std;
 
-void DelayQueue::read_packet( const string & contents )
+void DelayQueue::read_packet( const string & contents ) // 从trace读包
 {
-    packet_queue_.emplace( timestamp() + delay_ms_, contents );
+    packet_queue_.emplace( timestamp() + delay_ms_, contents ); // 当前时间戳+延长的时间，包
 }
 
-void DelayQueue::write_packets( FileDescriptor & fd )
+void DelayQueue::write_packets( FileDescriptor & fd ) //  向trace写包？
 {
     while ( (!packet_queue_.empty())
             && (packet_queue_.front().first <= timestamp()) ) {

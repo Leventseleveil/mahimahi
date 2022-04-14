@@ -27,6 +27,7 @@ private:
     unsigned int packet_in_transit_bytes_left_;
     std::queue<std::string> output_queue_;
 
+    // 智能指针是一个可以像指针一样工作的对象，但是当它不再被使用时，可以自动删除动态分配的内存
     std::unique_ptr<std::ofstream> log_;
     std::unique_ptr<BinnedLiveGraph> throughput_graph_;
     std::unique_ptr<BinnedLiveGraph> delay_graph_;
@@ -58,8 +59,9 @@ public:
 
     unsigned int wait_time( void );
 
-    bool pending_output( void ) const;
+    bool pending_output( void ) const; // const表示不改变数据成员
 
+    // finished（）返回private类型的finished_标志（结尾的“_”表示这是个flag）
     bool finished( void ) const { return finished_; }
 };
 

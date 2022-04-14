@@ -24,7 +24,7 @@
             "cStandard": "c11",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-gcc-arm64"
-            // "intelliSenseMode": "linux-clang-arm64" https://blog.csdn.net/qq_45708377/article/details/112763469
+            // "intelliSenseMode": "linux-clang-arm64" linux-gcc-arm64 https://blog.csdn.net/qq_45708377/article/details/112763469
             // "configurationProvider": "ms-vscode.cpptools"
         }
     ],

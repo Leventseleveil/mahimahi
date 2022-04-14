@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-# converts a trace FROM varying rate (in kilobits per millisecond,
+# converts a trace FROM varying rate (in kilobits per millisecond, // 从可变速率转成trace文件（以千比特/毫秒为单位，每毫秒采样一次）
 # sampled once per millisecond)
-# TO packet delivery occurrences (millisecond timestamps when an
+# TO packet delivery occurrences (millisecond timestamps when an // 数据包交付事件（MTU大小的数据报，即12000位，可交付时的毫秒时间戳）
 # MTU-sized datagram, i.e. 12,000 bits, can be delivered)
 #
-# The latter is the format that mm-link expects.
+# The latter is the format that mm-link expects. // 后者是mm-link所期望的格式。（即traces文件
 #
 # KJW 7/28/2017
 

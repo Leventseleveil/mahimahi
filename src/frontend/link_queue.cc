@@ -16,7 +16,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                       const bool repeat, const bool graph_throughput, const bool graph_delay,
                       unique_ptr<AbstractPacketQueue> && packet_queue,
                       const string & command_line )
-    : next_delivery_( 0 ),
+    : next_delivery_( 0 ), // next_delivery_为无符号整数，初始化为0，*每传递一次+1
       schedule_(), // schedule 表示时刻表容器/时间戳容器
       base_timestamp_( timestamp() ),
       packet_queue_( move( packet_queue ) ),
@@ -27,7 +27,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
       throughput_graph_( nullptr ),
       delay_graph_( nullptr ),
       repeat_( repeat ), // 初始值为true，表示默认重复读取文件
-      finished_( false ) // finished表示读取完成的信号
+      finished_( false ) // finished表示读取完成的信号，初始当然未完成
 {
     assert_not_root(); // 断言不是root用户
 
@@ -41,7 +41,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
 
     string line;
 
-
+    // 这里是构造函数初始化，所以这段要删除
     while ( trace_file.good() and getline( trace_file, line ) ) {
 
         // 首先检查该行是否为空
@@ -66,7 +66,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
         /**
          * emplace_back() 在实现时，直接在容器尾部创建这个元素，省去了拷贝或移动元素的过程。（对比push_back）
          */
-        schedule_.emplace_back( ms ); // schedule_是个64位机器上的vector
+        schedule_.emplace_back( ms ); // *schedule_是个64位机器上的vector
     }
 
     if ( schedule_.empty() ) {
@@ -152,6 +152,15 @@ void LinkQueue::record_departure_opportunity( void )
     }
 
     /* meter the delivery opportunity */
+    /** 每行表示传送一个包，图上折线的变化其实都是同一个时间戳堆叠出来的
+     *  7
+     *  8
+     *  8
+     *  8
+     *  8
+     *  8
+     *  8
+     */
     if ( throughput_graph_ ) {
         throughput_graph_->add_value_now( 0, PACKET_SIZE );
     }    
@@ -179,7 +188,7 @@ void LinkQueue::record_departure( const uint64_t departure_time, const QueuedPac
 // 读包
 void LinkQueue::read_packet( const string & contents )
 {
-    const uint64_t now = timestamp();
+    const uint64_t now = timestamp(); // 当前时间戳
 
     if ( contents.size() > PACKET_SIZE ) { // 如果传送的包容量超过限定 const static unsigned int PACKET_SIZE = 1504;
         throw runtime_error( "packet size is greater than maximum" );
@@ -204,27 +213,36 @@ void LinkQueue::read_packet( const string & contents )
     }
 }
 
-// 下一次传递时间
+// next_delivery_time 返回下一次传递时间
 uint64_t LinkQueue::next_delivery_time( void ) const
 {
-    if ( finished_ ) {
+    if ( finished_ ) { // 如果完成了，返回-1
         return -1;
     } else {
-        return schedule_.at( next_delivery_ ) + base_timestamp_;
+        /**
+         * at()是std::vector的一个方法，根据元号返回元值。
+         * 相比于[]运算符，这方法会进行边界检查，如果越界则引发异常，而[]则不会。
+         * 因此本方法相对来讲安全性高，但效率低（当然这种程度一般可以无视）。
+         */
+        //下一次传递时间 = 下一次传送的次数对应的时间戳（如果比如连着几行8的话，虽然next_delivery_不断+1，但是其对应的时间戳还是不变的） + 基准时间
+        return schedule_.at( next_delivery_ ) + base_timestamp_; 
     }
 }
 
+// use_a_delivery_opportunity 的作用是给next_delivery_+1
 void LinkQueue::use_a_delivery_opportunity( void )
 {
-    record_departure_opportunity();
+    record_departure_opportunity(); // 在日志和图表上记录
 
     next_delivery_ = (next_delivery_ + 1) % schedule_.size();
 
-    /* wraparound */
+    /* wraparound 环绕的 */
     if ( next_delivery_ == 0 ) {
-        if ( repeat_ ) {
-            base_timestamp_ += schedule_.back();
-        } else {
+        if ( repeat_ ) { // 如果重复的话继续下一轮
+            // base_timestamp_ =base_timestamp_ + schedule_.back()
+            // base_timestamp_变为上一轮的基准时间+时间戳容器的最后一个时间戳
+            base_timestamp_ += schedule_.back(); // back()函数返回当前vector最末一个元素的引用
+        } else { // 否则便完成整个程序
             finished_ = true;
         }
     }
@@ -265,7 +283,7 @@ void LinkQueue::rationalize( const uint64_t now )
             packet_in_transit_bytes_left_ -= amount_to_send;
             bytes_left_in_this_delivery -= amount_to_send;
 
-            /* has the packet been fully sent? */
+            /* has the packet been fully sent? 数据包已经全部寄出了吗？ */
             if ( packet_in_transit_bytes_left_ == 0 ) {
                 record_departure( this_delivery_time, packet_in_transit_ );
 

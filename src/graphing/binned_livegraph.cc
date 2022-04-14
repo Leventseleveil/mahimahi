@@ -101,7 +101,7 @@ void BinnedLiveGraph::add_value_now( const unsigned int num, const unsigned int 
     unique_lock<mutex> ul { mutex_ };
 
     if ( value_this_bin_.at( num ) < 0 ) {
-        throw runtime_error( "BinnedLiveGraph: attempt to add to a default value" );
+        throw runtime_error( "BinnedLiveGraph: attempt to add to a default value" ); // 尝试添加到默认值
     }
 
     value_this_bin_.at( num ) += amount;
