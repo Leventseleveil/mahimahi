@@ -185,11 +185,11 @@ int main( int argc, char *argv[] )
         PacketShell<LinkQueue> link_shell_app( "link", user_environment );
 
         link_shell_app.start_uplink( "[link] ", command, // [link] xun1@ubuntu:~/mahimahi$ 
-                                     "Uplink", uplink_filename, uplink_logfile, repeat, meter_uplink, meter_uplink_delay,
+                                     "Uplink", uplink_filename, uplink_logfile, repeat, meter_uplink, meter_uplink_delay, // d
                                      get_packet_queue( uplink_queue_type, uplink_queue_args, argv[ 0 ] ),
                                      command_line );
 
-        link_shell_app.start_downlink( "Downlink", downlink_filename, downlink_logfile, repeat, meter_downlink, meter_downlink_delay,
+        link_shell_app.start_downlink( "Downlink", downlink_filename, downlink_logfile, repeat, meter_downlink, meter_downlink_delay, // d
                                        get_packet_queue( downlink_queue_type, downlink_queue_args, argv[ 0 ] ),
                                        command_line );
 

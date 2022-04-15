@@ -23,12 +23,17 @@ use warnings;
 use Scalar::Util qw[looks_like_number];
 use POSIX qw[ceil];
 
+my $ms = 0; # 现实时间 单位ms
 my $time = 0; # my是私有变量， 标量 $ 开始
 my $reserve_bits = 0; # 缓冲的bits
 my $PACKET_LENGTH = 12000; # bits = 1500B
+my $kilobits_this_millisecond = 0;
 
 # input trace gives a number of kilobits that can be delivered each millisecond 输入跟踪给出了每毫秒可以传输的千位数
-while (my $kilobits_this_millisecond = <>) { # kilobits_this_millisecond 千比特这毫秒， <> 表示输入测参数
+while (1) { # kilobits_this_millisecond 千比特这毫秒， <> 表示输入测参数
+  # $kilobits_this_millisecond = 3 * abs(cos($ms)) * rand(10); # 期望在1～48之间取数
+  # $ms = $ms + rand();
+  $kilobits_this_millisecond = rand(36);
   chomp $kilobits_this_millisecond; # 如果字符串结尾有换行符，chomp 可以去掉它 https://blog.csdn.net/wesleyluo/article/details/5862706
   die qq{Not a number: "$kilobits_this_millisecond"} # 检查是不是一个数，粗错误处理
     unless looks_like_number $kilobits_this_millisecond;
@@ -39,10 +44,11 @@ while (my $kilobits_this_millisecond = <>) { # kilobits_this_millisecond 千比�
   # if reserve has enough bits for a packet, deliver it now 如果reserve有足够的数据包位，请立即发送
   # output trace gives timestamps of packet delivery occurrences 输出跟踪提供数据包传递事件的时间戳
   while ( $reserve_bits >= $PACKET_LENGTH ) { # 只要输出数加起来大于PACKET_LENGTH了就输出一次，相当于吞吐量
-    print qq{timestamp: $time\n};
+    print qq{$time\n};
     $reserve_bits -= $PACKET_LENGTH;
   }
 
   # advance time by one millisecond 将时间前进一毫秒
   $time++;
+  sleep(1); # 这个函数令脚本睡眠 EXPR 秒，如果没有 EXPR 则是永久睡眠
 }
