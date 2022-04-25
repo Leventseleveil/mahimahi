@@ -35,7 +35,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
     ifstream trace_file( filename ); // ifstream是从硬盘到内存，其实所谓的流缓冲就是内存空间
 
     // 检查
-    if ( not trace_file.good() ) {
+    if ( not trace_file.good() ) { // good()读写正常
         throw runtime_error( filename + ": error opening for reading" );
     }
 
@@ -43,6 +43,12 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
 
     // 这里是构造函数初始化，所以这段要删除
     while ( trace_file.good() and getline( trace_file, line ) ) {
+        /**
+         * 
+         * getline(cin, inputLine);
+         * 其中 cin 是正在读取的输入流，而 inputLine 是接收输入字符串的 string 变量的名称。下面的程序演示了 getline 函数的应用：
+         * 
+         */
 
         // 首先检查该行是否为空
         if ( line.empty() ) {
