@@ -9,9 +9,23 @@
 #include <bits/stdc++.h>//万能头文件，强烈建议必写
 using namespace std;//必写，声明使用std名称空间，不用理解
 
+// char* int2chars(int time, char* chars) {
+// 	int i = 0;
+// 	while (time) {
+// 		chars[i++] = time % 10 + '0';
+// 		time /= 10;
+// 	}
+// }
 
-int main()
-{
+
+int main() {
+	int ms = 0; // 现实时间 单位ms
+    int time = 0; // my是私有变量， 标量 $ 开始
+    int reserve_bits = 0; // 缓冲的bits
+    int PACKET_LENGTH = 12000; // bits = 1500B
+    int kilobits_this_millisecond = 0;
+	string a;
+
 	char send_msg[1024];
 	char recv_msg[1024];
 	int sockfd;
@@ -47,16 +61,24 @@ int main()
 		}
 	}
 	// 开始交流
-	while(1)
-	{	// 这段代码有问题 得先写再读
-		memset(send_msg, 0, sizeof(send_msg));
-		//scanf("%s",send_msg); // 只能从这里输入
-		cin>>send_msg;
-		ret = write(sockfd,send_msg,sizeof(send_msg));
-		if (ret <= 0)
-		{
-			perror("send\n");
-		}
+	while(1){	// 这段代码有问题 得先写再读
+		// //scanf("%s",send_msg); // 只能从这里输入
+		// cin>>send_msg;
+
+		kilobits_this_millisecond = rand() % 36 + 1;
+        // cout<<kilobits_this_millisecond<<endl;
+        reserve_bits += 1000 * kilobits_this_millisecond;
+        while (reserve_bits >= PACKET_LENGTH){
+			memset(send_msg, 0, sizeof(send_msg));
+            a = to_string(time);
+			strcpy(send_msg, a.c_str());
+			ret = write(sockfd, send_msg, sizeof(send_msg));
+			if (ret <= 0) {perror("send\n");}
+            reserve_bits -= PACKET_LENGTH;
+        }
+        
+        time++;
+        sleep(1);
 
 		// 此段可删
 		// ret = read(sockfd,recv_msg, sizeof(recv_msg));

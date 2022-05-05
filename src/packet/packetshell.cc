@@ -123,7 +123,7 @@ void PacketShell<FerryQueueType>::start_uplink( const string & shell_prefix,
             /* allow downlink to write directly to inner namespace's TUN device */
             pipe_.first.send_fd( ingress_tun );
 
-            FerryQueueType uplink_queue { ferry_maker() };
+            FerryQueueType uplink_queue { ferry_maker() }; // 初始化uplink_queue
             return inner_ferry.loop( uplink_queue, ingress_tun, egress_tun_ );
         }, true );  /* new network namespace */
 }
