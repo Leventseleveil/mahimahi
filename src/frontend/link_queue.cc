@@ -18,7 +18,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                       const string & command_line )
     : next_delivery_( 0 ), // next_delivery_为无符号整数，初始化为0，*每传递一次+1
       schedule_(), // schedule 表示时刻表容器/时间戳容器
-      base_timestamp_( timestamp() ),
+      base_timestamp_( timestamp() ), // 获取系统当前时间， 并初始化initial_timestamp（这个值之后将保持不变）
       packet_queue_( move( packet_queue ) ),
       packet_in_transit_( "", 0 ),
       packet_in_transit_bytes_left_( 0 ),
@@ -231,22 +231,30 @@ uint64_t LinkQueue::next_delivery_time( void ) const
          * 因此本方法相对来讲安全性高，但效率低（当然这种程度一般可以无视）。
          */
         //下一次传递时间 = 下一次传送的次数对应的时间戳（如果比如连着几行8的话，虽然next_delivery_不断+1，但是其对应的时间戳还是不变的） + 基准时间
+        // .at(idx) 传回索引idx所指的数据，如果idx越界，抛出out_of_range。
         return schedule_.at( next_delivery_ ) + base_timestamp_; 
     }
 }
 
-// use_a_delivery_opportunity 的作用是给next_delivery_+1
+
+/**
+ * use_a_delivery_opportunity 的作用是给next_delivery_+1,
+ * 如果到达traces文件的头并且repeat_参数是false的话，则结束整个程序
+ * 
+ */
 void LinkQueue::use_a_delivery_opportunity( void )
 {
     record_departure_opportunity(); // 在日志和图表上记录
 
+    // 重复用的，如果当前循环完了，就从第一行重新开始
     next_delivery_ = (next_delivery_ + 1) % schedule_.size();
 
     /* wraparound 环绕的 */
-    if ( next_delivery_ == 0 ) {
+    if ( next_delivery_ == 0 ) { // 如果next_delivery_已经到traces文件的头了
         if ( repeat_ ) { // 如果重复的话继续下一轮
             // base_timestamp_ =base_timestamp_ + schedule_.back()
             // base_timestamp_变为上一轮的基准时间+时间戳容器的最后一个时间戳
+            // 另：base_timestamp_只在该行有变化
             base_timestamp_ += schedule_.back(); // back()函数返回当前vector最末一个元素的引用
         } else { // 否则便完成整个程序
             finished_ = true;

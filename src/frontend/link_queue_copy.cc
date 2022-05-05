@@ -18,7 +18,7 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                       const string & command_line )
     : next_delivery_( 0 ), // next_delivery_为无符号整数，初始化为0，*每传递一次+1
       schedule_(), // schedule 表示时刻表容器/时间戳容器
-      base_timestamp_( timestamp() ),
+      base_timestamp_( timestamp() ), // base_timestamp_ 表示基准时间 初始值为0
       packet_queue_( move( packet_queue ) ),
       packet_in_transit_( "", 0 ),
       packet_in_transit_bytes_left_( 0 ),
@@ -96,8 +96,8 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
         *log_ << "# mahimahi mm-link (" << link_name << ") [" << filename << "] > " << logfile << endl;
         *log_ << "# command line: " << command_line << endl;
         *log_ << "# queue: " << packet_queue_->to_string() << endl;
-        *log_ << "# init timestamp: " << initial_timestamp() << endl;
-        *log_ << "# base timestamp: " << base_timestamp_ << endl;
+        *log_ << "# init timestamp: " << initial_timestamp() << endl; // 比如initial_timestamp(): 1651741030963
+        *log_ << "# base timestamp: " << base_timestamp_ << endl; // 一开始一般是0
         const char * prefix = getenv( "MAHIMAHI_SHELL_PREFIX" );
         if ( prefix ) {
             *log_ << "# mahimahi config: " << prefix << endl;
@@ -247,7 +247,12 @@ uint64_t LinkQueue::next_delivery_time( void ) const
     }
 }
 
-// use_a_delivery_opportunity 的作用是给next_delivery_+1
+
+/**
+ * use_a_delivery_opportunity 的作用是给next_delivery_+1,
+ * 如果到达traces文件的头并且repeat_参数是false的话，则结束整个程序
+ * 
+ */
 void LinkQueue::use_a_delivery_opportunity( void )
 {
     record_departure_opportunity(); // 在日志和图表上记录
@@ -260,6 +265,7 @@ void LinkQueue::use_a_delivery_opportunity( void )
         if ( repeat_ ) { // 如果重复的话继续下一轮
             // base_timestamp_ =base_timestamp_ + schedule_.back()
             // base_timestamp_变为上一轮的基准时间+时间戳容器的最后一个时间戳
+            // 另：base_timestamp_只在该行有变化
             base_timestamp_ += schedule_.back(); // back()函数返回当前vector最末一个元素的引用
         } else { // 否则便完成整个程序
             finished_ = true;
