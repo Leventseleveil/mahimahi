@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <vector>
 #include <iostream>//必写，其实就是c的#include <stdio.h>
 using namespace std;//必写，声明使用std名称空间，不用理解
 // 先开服务器
@@ -12,6 +13,7 @@ using namespace std;//必写，声明使用std名称空间，不用理解
 int main(int argc,char *argv[])
 {
 	char buf[1024];
+	vector<uint64_t> schedule_;
 	char send_msg[]="l`m server!";
 	int msg_len;
 	int server_fd,client_fd;
@@ -47,7 +49,8 @@ int main(int argc,char *argv[])
 			exit(-1);
 		}
 		//printf("recv msg is : %s\n",buf);
-		cout<<buf<<endl;
+		schedule_.emplace_back( atoi(buf) );
+		cout<<schedule_.back()<<endl;
 
 		// 此段可删
 		// if(-1 == (msg_len = write(client_fd, send_msg, sizeof(buf))))

@@ -58,7 +58,25 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "bit": "cpp",
-        "charconv": "cpp"
+        "charconv": "cpp",
+        "any": "cpp",
+        "bitset": "cpp",
+        "cfenv": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp",
+        "csetjmp": "cpp",
+        "cuchar": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "filesystem": "cpp",
+        "regex": "cpp",
+        "future": "cpp",
+        "iomanip": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "typeindex": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

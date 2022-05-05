@@ -242,6 +242,7 @@ uint64_t LinkQueue::next_delivery_time( void ) const
          * 因此本方法相对来讲安全性高，但效率低（当然这种程度一般可以无视）。
          */
         //下一次传递时间 = 下一次传送的次数对应的时间戳（如果比如连着几行8的话，虽然next_delivery_不断+1，但是其对应的时间戳还是不变的） + 基准时间
+        // .at(idx) 传回索引idx所指的数据，如果idx越界，抛出out_of_range。
         return schedule_.at( next_delivery_ ) + base_timestamp_; 
     }
 }
@@ -251,10 +252,11 @@ void LinkQueue::use_a_delivery_opportunity( void )
 {
     record_departure_opportunity(); // 在日志和图表上记录
 
-    next_delivery_ = (next_delivery_ + 1) % schedule_.size();
+    // 重复用的，如果当前循环完了，就从第一行重新开始
+    next_delivery_ = (next_delivery_ + 1) % schedule_.size(); 
 
     /* wraparound 环绕的 */
-    if ( next_delivery_ == 0 ) {
+    if ( next_delivery_ == 0 ) { // 如果next_delivery_已经到traces文件的头了
         if ( repeat_ ) { // 如果重复的话继续下一轮
             // base_timestamp_ =base_timestamp_ + schedule_.back()
             // base_timestamp_变为上一轮的基准时间+时间戳容器的最后一个时间戳
