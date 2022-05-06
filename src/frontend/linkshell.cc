@@ -23,7 +23,7 @@ void usage_error( const string & program_name ) // 这里 program_name是mm-link
     cerr << "          --meter-all" << endl;
     cerr << "          --uplink-queue=QUEUE_TYPE --downlink-queue=QUEUE_TYPE" << endl;
     cerr << "          --uplink-queue-args=QUEUE_ARGS --downlink-queue-args=QUEUE_ARGS" << endl;
-    cerr << endl;
+    cerr << endl;       // 默认为infinite， 即不丢弃
     cerr << "          QUEUE_TYPE = infinite | droptail | drophead | codel | pie" << endl; // 极大的 ｜ 丢弃尾部 ｜ 丢弃首部 ｜ 
     cerr << "          QUEUE_ARGS = \"NAME=NUMBER[, NAME2=NUMBER2, ...]\"" << endl;
     cerr << "              (with NAME = bytes | packets | target | interval | qdelay_ref | max_burst)" << endl;

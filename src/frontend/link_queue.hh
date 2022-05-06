@@ -8,6 +8,7 @@
 #include <string>
 #include <fstream>
 #include <memory>
+#include <thread>
 
 #include "file_descriptor.hh"
 #include "binned_livegraph.hh"

@@ -18,8 +18,8 @@ LinkQueue::LinkQueue( const string & link_name, const string & filename, const s
                       const string & command_line )
     : next_delivery_( 0 ), // next_delivery_为无符号整数，初始化为0，*每传递一次+1
       schedule_(), // schedule 表示时刻表容器/时间戳容器
-      base_timestamp_( timestamp() ), // 获取系统当前时间， 并初始化initial_timestamp（这个值之后将保持不变）
-      packet_queue_( move( packet_queue ) ),
+      base_timestamp_( timestamp() ), // base_timestamp_ 表示基准时间 初始值为0（之后不重复的话一直为0）， base_timestamp_一般为0，重复的话为0 + traces文件最后一行 * 重复次数， 
+      packet_queue_( move( packet_queue ) ), // move 将指针的所有权从一个unique_ptr转移给另一个unique_ptr
       packet_in_transit_( "", 0 ),
       packet_in_transit_bytes_left_( 0 ),
       output_queue_(),
@@ -194,7 +194,7 @@ void LinkQueue::record_departure( const uint64_t departure_time, const QueuedPac
 // 读包
 void LinkQueue::read_packet( const string & contents )
 {
-    const uint64_t now = timestamp(); // 当前时间戳
+    const uint64_t now = timestamp(); // 当前时间戳，从函数开始运行后经过的毫秒数， 应该是表示图中的横坐标
 
     if ( contents.size() > PACKET_SIZE ) { // 如果传送的包容量超过限定 const static unsigned int PACKET_SIZE = 1504;
         throw runtime_error( "packet size is greater than maximum" );
@@ -220,9 +220,14 @@ void LinkQueue::read_packet( const string & contents )
 }
 
 // next_delivery_time 返回下一次传递时间
+/**
+ * 最重要的一个函数
+ * 
+ * @return 相当于trace中的一行
+ */
 uint64_t LinkQueue::next_delivery_time( void ) const
 {
-    if ( finished_ ) { // 如果完成了，返回-1
+    if ( finished_ ) { // 如果完成了，返回-1 实时发送的话不考虑，咱可以直接exit
         return -1;
     } else {
         /**
@@ -232,7 +237,7 @@ uint64_t LinkQueue::next_delivery_time( void ) const
          */
         //下一次传递时间 = 下一次传送的次数对应的时间戳（如果比如连着几行8的话，虽然next_delivery_不断+1，但是其对应的时间戳还是不变的） + 基准时间
         // .at(idx) 传回索引idx所指的数据，如果idx越界，抛出out_of_range。
-        return schedule_.at( next_delivery_ ) + base_timestamp_; 
+        return schedule_.at( next_delivery_ ) + base_timestamp_; // base_timestamp_
     }
 }
 
@@ -262,7 +267,7 @@ void LinkQueue::use_a_delivery_opportunity( void )
     }
 }
 
-/* emulate the link up to the given timestamp */ // 模拟链接直到给定的时间戳
+/* emulate the link up to the given timestamp */ // 仿真链接直到给定的时间戳
 /* this function should be called before enqueueing any packets and before
    calculating the wait_time until the next event */
 // 在将任何数据包排入队列之前，以及在计算下一个事件之前的等待时间之前，应该调用此函数
@@ -316,12 +321,30 @@ void LinkQueue::write_packets( FileDescriptor & fd )
     }
 }
 
+/**
+ * 等待的时间
+ * 
+ * @return 等待的时间（无需等待即刻出发 为0 或是 等待next_delivery_time() - now 毫秒）
+ */
 unsigned int LinkQueue::wait_time( void )
 {
     const auto now = timestamp();
 
-    rationalize( now );
+    rationalize( now ); // 如果 next_delivery_time() <= now， 则相当于该函数啥没干
 
+    /**
+     * 
+     * next_delivery_time() 相当于返回traces中的下一行，也就是下一次包传递时间
+     * traces文件中可能为：
+     * 1056
+     * 1143
+     * 1210
+     * ...
+     * 
+     * 也就是可能在1056ms才开始发送，
+     * 而当前的timestamp()可能才刚开始 为9
+     * 此时就需要等待
+     */
     if ( next_delivery_time() <= now ) {
         return 0;
     } else {

@@ -14,7 +14,7 @@ using namespace std;
 
 void usage_error( const string & program_name ) // 这里 program_name是mm-link
 {
-    cerr << "Usage: " << program_name << " UPLINK-TRACE-REALTIME-CPP DOWNLINK-TRACE-REALTIME-CPP [OPTION]... [COMMAND]" << endl;
+    cerr << "Usage: " << program_name << " UPLINK-TRACE-REALTIME DOWNLINK-TRACE-REALTIME [OPTION]... [COMMAND]" << endl; // filename 仅仅要求是个代号
     cerr << endl;
     cerr << "Options = --once" << endl;
     cerr << "          --uplink-log=FILENAME --downlink-log=FILENAME" << endl;

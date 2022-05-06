@@ -40,7 +40,7 @@ uint64_t initial_timestamp( void )
 /**
  * 
  * 
- * @return uint64_t 
+ * @return 从函数开始运行后经过的毫秒数
  */
 uint64_t timestamp( void )
 {

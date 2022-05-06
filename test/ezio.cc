@@ -49,3 +49,9 @@ double myatof( const string & str )
 
     return ret;
 }
+
+int main() {
+    string a = "24";
+    int b = myatoi(a);
+    std::cout<<b<<std::endl;
+}

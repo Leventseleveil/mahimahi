@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include<sys/types.h>
 #include<sys/socket.h>
+#include<thread>
 using namespace std;//必写，声明使用std名称空间，不用理解
 
 int main()//主框架和c一样
